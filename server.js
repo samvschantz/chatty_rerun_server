@@ -32,9 +32,13 @@ wss.broadcast = function broadcast(data) {
 wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('message', function incoming(data) {
-    console.log(JSON.parse(data));
     let msgObj = JSON.parse(data)
     msgObj.uuid = uuidv1();
+    if(msgObj.username !== msgObj.newName && msgObj.newName !== ''){
+      msgObj.type = 'notification';
+    } else {
+      msgObj.type = 'message';
+    }
     msgObj = JSON.stringify(msgObj);
     // Broadcast to everyone else.
     wss.broadcast = function broadcast(data) {
