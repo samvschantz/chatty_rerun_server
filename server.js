@@ -30,14 +30,17 @@ wss.broadcast = function broadcast(data) {
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 wss.on('connection', (ws) => {
-  console.log('Client connected');
+  connectionObj = { type: 'connectCount' };
+  connectionObj.num = wss.clients.size;
+  connectionObj = JSON.stringify(connectionObj)
+  wss.broadcast(connectionObj);
   ws.on('message', function incoming(data) {
     let msgObj = JSON.parse(data)
     msgObj.uuid = uuidv1();
     if(msgObj.username !== msgObj.newName && msgObj.newName !== ''){
       msgObj.type = 'notification';
     } else {
-      msgObj.type = 'message';
+      msgObj.type = 'regular';
     }
     msgObj = JSON.stringify(msgObj);
     // Broadcast to everyone else.
@@ -51,5 +54,8 @@ wss.on('connection', (ws) => {
     wss.broadcast(msgObj);
   });
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    connectionObj.num = wss.clients.size;
+    wss.broadcast(connectionObj);
+  });
 });
