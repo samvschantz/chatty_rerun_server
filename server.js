@@ -37,8 +37,6 @@ wss.on('connection', (ws) => {
   ws.on('message', function incoming(data) {
     let msgObj = JSON.parse(data)
     msgObj.uuid = uuidv1();
-    console.log(msgObj.username);
-    console.log(msgObj.newName);
     if(msgObj.username !== msgObj.newName && msgObj.newName !== ''){
       msgObj.type = 'notification';
     } else {
